@@ -1,0 +1,21 @@
+---
+- name: YUM | Install the remi-release rpm
+  yum:
+    name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+    state=present
+
+- name: YUM | Ensure our system packages are installed
+  yum:
+    name={{ item }}
+    state=present
+  with_items: packages
+
+- name: PIP | Update to newest version.
+  pip:
+    name=pip
+    extra_args=-U
+
+- name: Update all packages
+  yum:
+    name=*
+    state=latest

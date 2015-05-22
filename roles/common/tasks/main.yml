@@ -1,0 +1,15 @@
+---
+# This role contains common plays that will run on all nodes.
+
+- include: clock-setup.yml
+- include: crond-setup.yml
+- include: ssh-settings.yml
+
+- include: install-base-packages.yml
+- include: git-setup.yml version={{ installversion.git }} tags=git
+  when: is_vagrant is defined
+- include: ack-setup.yml
+- include: vim-setup.yml
+
+# Create all our groups.
+- include: includes/group-setup.yml name=apache

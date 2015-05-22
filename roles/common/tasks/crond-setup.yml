@@ -1,0 +1,8 @@
+---
+- name: Crond | Set up crond
+  template:
+    src="{{ basedir }}/roles/common/files/crond/etc/sysconfig/crond"
+    dest=/etc/sysconfig/crond
+    owner=root
+    group=root
+    mode=0644

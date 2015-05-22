@@ -1,0 +1,10 @@
+---
+- name: Clock | Set up ntpd
+  template:
+    src="{{ basedir }}/roles/common/files/ntpd/etc/ntp.conf"
+    dest=/etc/ntp.conf
+    owner=root
+    group=root
+    mode=0644
+  notify:
+  - Restart ntpd

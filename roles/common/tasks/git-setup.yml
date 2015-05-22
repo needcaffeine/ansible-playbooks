@@ -1,0 +1,49 @@
+---
+- name: Git | Is Git {{ version }} installed?
+  shell: git --version | grep -i "{{ version }}"
+  register: git_exists
+  ignore_errors: yes
+
+- name: Git | Download and install Git
+  get_url:
+    url=https://github.com/git/git/archive/v{{ version }}.tar.gz
+    dest=/tmp/git-{{ version }}.tar.gz
+  register: get_url_git_result
+  when: git_exists|failed
+
+- unarchive:
+    src=/tmp/git-{{ version }}.tar.gz
+    dest=/tmp/
+    copy=no
+  when: get_url_git_result.changed
+
+- shell:
+    chdir=/tmp/git-{{ version }}
+    make configure
+  register: configure_result
+  when: get_url_git_result.changed
+
+- shell:
+    chdir=/tmp/git-{{ version }}
+    ./configure --prefix=/usr --without-tcltk
+  when: configure_result.changed
+
+- shell:
+    chdir=/tmp/git-{{ version }}
+    make all doc
+  when: configure_result.changed
+
+- shell:
+    chdir=/tmp/git-{{ version }}
+    make install install-doc install-html
+  when: configure_result.changed
+
+- name: Git | Post-install cleanup
+  file:
+    path=/tmp/git-{{ version }}
+    state=absent
+
+- name: Git | Post-install cleanup
+  file:
+    path=/tmp/git-{{ version }}.tar.gz
+    state=absent

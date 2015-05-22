@@ -1,0 +1,45 @@
+---
+- name: VIM | Is Vim 7.4 installed?
+  shell:
+    /usr/bin/vim --version|grep -i "Vi IMproved 7.4"
+  register: vim74_installed
+  ignore_errors: yes
+
+- name: VIM | Download and install VIM
+  get_url:
+    url=ftp://ftp.vim.org/pub/vim/unix/vim-7.4.tar.bz2
+    dest=/tmp/vim-7.4.tar.bz2
+  register: get_url_vim_result
+  when: vim74_installed|failed
+
+- unarchive:
+    src=/tmp/vim-7.4.tar.bz2
+    dest=/tmp/
+    copy=no
+  when: get_url_vim_result.changed
+
+- shell:
+    chdir=/tmp/vim74
+    ./configure --prefix=/usr --with-features=huge --enable-rubyinterp --enable-pythoninterp
+  register: configure_result
+  when: get_url_vim_result.changed
+
+- shell:
+    chdir=/tmp/vim74
+    make
+  when: configure_result.changed
+
+- shell:
+    chdir=/tmp/vim74
+    make install
+  when: configure_result.changed
+
+- name: VIM | Post-install cleanup
+  file:
+    path=/tmp/vim74
+    state=absent
+
+- name: VIM | Post-install cleanup
+  file:
+    path=/tmp/vim-7.4.tar.bz2
+    state=absent

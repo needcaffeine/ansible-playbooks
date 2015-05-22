@@ -1,0 +1,17 @@
+---
+
+- name: Apply common configuration to all nodes
+  hosts: all
+  gather_facts: no
+  sudo: True
+  remote_user: ec2-user
+  connection: paramiko
+
+  vars:
+    basedir: .
+
+  vars_files:
+    - "{{ basedir }}/group_vars/all"
+
+  roles:
+    - common

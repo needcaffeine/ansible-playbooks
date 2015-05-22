@@ -1,0 +1,47 @@
+---
+- name: SSH | Allow agent forwarding
+  lineinfile:
+    backup=no
+    state=present
+    dest=/etc/ssh/sshd_config
+    regexp='^#?AllowAgentForwarding yes'
+    line='AllowAgentForwarding yes'
+  notify:
+  - Restart sshd
+
+- name: SSH | Disallow password authentication
+  lineinfile:
+    backup=no
+    state=present
+    dest=/etc/ssh/sshd_config
+    regexp='^#?PasswordAuthentication.*'
+    line='PasswordAuthentication no'
+  notify:
+  - Restart sshd
+
+- name: SSH | Prevent empty passwords
+  lineinfile:
+    backup=no
+    state=present
+    dest=/etc/ssh/sshd_config
+    regexp='^#?PermitEmptyPasswords.*'
+    line='PermitEmptyPasswords no'
+  notify:
+  - Restart sshd
+
+- name: Sudoers | Disable requiretty so that ansible can rsync
+  lineinfile:
+    state=present
+    dest=/etc/sudoers
+    regexp='^#?Defaults.*?requiretty'
+    line='Defaults !requiretty'
+    validate='visudo -cf %s'
+
+- name: Sudoers | Allow vagrant user to sudo -u
+  copy:
+    src="{{ basedir }}/roles/common/files/sudo/etc/sudoers.d/vagrant"
+    dest=/etc/sudoers.d
+    owner=root
+    group=root
+    mode=0640
+  when: is_vagrant is defined

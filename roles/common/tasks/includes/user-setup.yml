@@ -1,0 +1,24 @@
+---
+- name: User | Ensure user {{ name }} exists
+  user:
+    name={{ name }}
+    group={{ name }}
+    groups={{ usergroups }}
+    state=present
+
+- name: User | Ensure {{ name }}/home/.ssh directory exists
+  file:
+    path=/home/{{ name }}/.ssh
+    state=directory
+    owner={{ name }}
+    group={{ name }}
+    mode=0700
+
+- name: User | Copy over ssh key for {{ name }} user
+  template:
+    src="{{ basedir }}/roles/common/files/home/{{ name }}/.ssh/id_rsa"
+    dest=/home/{{ name }}/.ssh/id_rsa
+    owner={{ name }}
+    group={{ name }}
+    mode=0600
+  ignore_errors: yes

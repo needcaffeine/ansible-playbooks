@@ -41,3 +41,6 @@ packages:
   - docker
 
 defaultuser: ec2-user
+
+installversion:
+  git: 2.2.1
